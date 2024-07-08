@@ -1,13 +1,12 @@
-version: "3.4"
-
 services:
   api:
-    image: ghcr.io/saleor/saleor:3.19
+    image: 'ghcr.io/saleor/saleor:3.19'
     ports:
-      - 8000:8000
+      - '8000:8000'
     restart: unless-stopped
     networks:
-      - saleor-backend-tier
+      saleor-backend-tier: null
+      q88ocsc: null
     stdin_open: true
     tty: true
     depends_on:
@@ -15,52 +14,118 @@ services:
       - redis
       - jaeger
     volumes:
-      # shared volume between worker and api for media
-      - saleor-media:/app/media
+      - 'saleor-media:/app/media'
     env_file:
       - common.env
       - backend.env
     environment:
       - JAEGER_AGENT_HOST=jaeger
-      - DASHBOARD_URL=http://localhost:9000/
-      - ALLOWED_HOSTS=localhost,api
-
+      - 'DASHBOARD_URL=http://localhost:9000/'
+      - 'ALLOWED_HOSTS=localhost,api'
+    labels:
+      - traefik.enable=true
+      - traefik.http.middlewares.gzip.compress=true
+      - traefik.http.middlewares.redirect-to-https.redirectscheme.scheme=https
+      - traefik.http.routers.http-0-vgkow0k.entryPoints=http
+      - 'traefik.http.routers.http-0-vgkow0k.rule=Host(`n4sscg4.networkguru.ir`) && PathPrefix(`/`)'
+      - traefik.http.routers.https-0-vgkow0k.entryPoints=https
+      - traefik.http.routers.https-0-vgkow0k.middlewares=gzip
+      - 'traefik.http.routers.https-0-vgkow0k.rule=Host(`n4sscg4.networkguru.ir`) && PathPrefix(`/`)'
+      - traefik.http.routers.https-0-vgkow0k.tls.certresolver=letsencrypt
+      - traefik.http.routers.https-0-vgkow0k.tls=true
+      - 'caddy_0.encode=zstd gzip'
+      - 'caddy_0.handle_path.0_reverse_proxy={{upstreams}}'
+      - 'caddy_0.handle_path=/*'
+      - caddy_0.header=-Server
+      - 'caddy_0.try_files={path} /index.html /index.php'
+      - 'caddy_0=https://n4sscg4.networkguru.ir'
+      - caddy_ingress_network=q88ocsc
+      - coolify.managed=true
+      - coolify.version=4.0.0-beta.306
+      - coolify.applicationId=10
+      - coolify.type=application
+      - coolify.name=api-q88ocsc-120704612928
+      - coolify.pullRequestId=0
+    container_name: api-q88ocsc-120704612928
   dashboard:
-    image: ghcr.io/saleor/saleor-dashboard:latest
+    image: 'ghcr.io/saleor/saleor-dashboard:latest'
     ports:
-      - 9000:80
-    restart: unless-stopped
-
-  db:
-    image: library/postgres:15-alpine
-    ports:
-      - 5432:5432
+      - '9000:80'
     restart: unless-stopped
     networks:
-      - saleor-backend-tier
+      q88ocsc: null
+    labels:
+      - traefik.enable=true
+      - traefik.http.middlewares.gzip.compress=true
+      - traefik.http.middlewares.redirect-to-https.redirectscheme.scheme=https
+      - traefik.http.routers.http-0-y0okgg4.entryPoints=http
+      - 'traefik.http.routers.http-0-y0okgg4.rule=Host(`m4gc0k0.networkguru.ir`) && PathPrefix(`/`)'
+      - traefik.http.routers.https-0-y0okgg4.entryPoints=https
+      - traefik.http.routers.https-0-y0okgg4.middlewares=gzip
+      - 'traefik.http.routers.https-0-y0okgg4.rule=Host(`m4gc0k0.networkguru.ir`) && PathPrefix(`/`)'
+      - traefik.http.routers.https-0-y0okgg4.tls.certresolver=letsencrypt
+      - traefik.http.routers.https-0-y0okgg4.tls=true
+      - 'caddy_0.encode=zstd gzip'
+      - 'caddy_0.handle_path.0_reverse_proxy={{upstreams}}'
+      - 'caddy_0.handle_path=/*'
+      - caddy_0.header=-Server
+      - 'caddy_0.try_files={path} /index.html /index.php'
+      - 'caddy_0=https://m4gc0k0.networkguru.ir'
+      - caddy_ingress_network=q88ocsc
+      - coolify.managed=true
+      - coolify.version=4.0.0-beta.306
+      - coolify.applicationId=10
+      - coolify.type=application
+      - coolify.name=dashboard-q88ocsc-120704613491
+      - coolify.pullRequestId=0
+    container_name: dashboard-q88ocsc-120704613491
+  db:
+    image: 'library/postgres:15-alpine'
+    ports:
+      - '5432:5432'
+    restart: unless-stopped
+    networks:
+      saleor-backend-tier: null
+      q88ocsc: null
     volumes:
-      - saleor-db:/var/lib/postgresql/data
-      - ./replica_user.sql:/docker-entrypoint-initdb.d/replica_user.sql
+      - 'saleor-db:/var/lib/postgresql/data'
+      - '/data/coolify/applications/q88ocsc/replica_user.sql:/docker-entrypoint-initdb.d/replica_user.sql'
     environment:
       - POSTGRES_USER=saleor
       - POSTGRES_PASSWORD=saleor
-
+    labels:
+      - coolify.managed=true
+      - coolify.version=4.0.0-beta.306
+      - coolify.applicationId=10
+      - coolify.type=application
+      - coolify.name=db-q88ocsc-120704613942
+      - coolify.pullRequestId=0
+    container_name: db-q88ocsc-120704613942
   redis:
-    image: library/redis:7.0-alpine
+    image: 'library/redis:7.0-alpine'
     ports:
-      - 6379:6379
+      - '6379:6379'
     restart: unless-stopped
     networks:
-      - saleor-backend-tier
+      saleor-backend-tier: null
+      q88ocsc: null
     volumes:
-      - saleor-redis:/data
-
+      - 'saleor-redis:/data'
+    labels:
+      - coolify.managed=true
+      - coolify.version=4.0.0-beta.306
+      - coolify.applicationId=10
+      - coolify.type=application
+      - coolify.name=redis-q88ocsc-120704614166
+      - coolify.pullRequestId=0
+    container_name: redis-q88ocsc-120704614166
   worker:
-    image: ghcr.io/saleor/saleor:3.19
-    command: celery -A saleor --app=saleor.celeryconf:app worker --loglevel=info -B
+    image: 'ghcr.io/saleor/saleor:3.19'
+    command: 'celery -A saleor --app=saleor.celeryconf:app worker --loglevel=info -B'
     restart: unless-stopped
     networks:
-      - saleor-backend-tier
+      saleor-backend-tier: null
+      q88ocsc: null
     env_file:
       - common.env
       - backend.env
@@ -68,42 +133,67 @@ services:
       - redis
       - mailpit
     volumes:
-      # shared volume between worker and api for media
-      - saleor-media:/app/media
-
+      - 'saleor-media:/app/media'
+    labels:
+      - coolify.managed=true
+      - coolify.version=4.0.0-beta.306
+      - coolify.applicationId=10
+      - coolify.type=application
+      - coolify.name=worker-q88ocsc-120704614369
+      - coolify.pullRequestId=0
+    container_name: worker-q88ocsc-120704614369
   jaeger:
     image: jaegertracing/all-in-one
     ports:
-      - "5775:5775/udp"
-      - "6831:6831/udp"
-      - "6832:6832/udp"
-      - "5778:5778"
-      - "16686:16686"
-      - "14268:14268"
-      - "9411:9411"
+      - '5775:5775/udp'
+      - '6831:6831/udp'
+      - '6832:6832/udp'
+      - '5778:5778'
+      - '16686:16686'
+      - '14268:14268'
+      - '9411:9411'
     restart: unless-stopped
     networks:
-      - saleor-backend-tier
+      saleor-backend-tier: null
+      q88ocsc: null
     volumes:
-      - type: tmpfs
-        target: /tmp
-
+      - 'jaeger-data:/data'
+    labels:
+      - coolify.managed=true
+      - coolify.version=4.0.0-beta.306
+      - coolify.applicationId=10
+      - coolify.type=application
+      - coolify.name=jaeger-q88ocsc-120704614557
+      - coolify.pullRequestId=0
+    container_name: jaeger-q88ocsc-120704614557
   mailpit:
     image: axllent/mailpit
     ports:
-      - 1025:1025 # smtp server
-      - 8025:8025 # web ui. Visit http://localhost:8025/ to check emails
+      - '1025:1025'
+      - '8025:8025'
     restart: unless-stopped
     networks:
-      - saleor-backend-tier
-
+      saleor-backend-tier: null
+      q88ocsc: null
+    labels:
+      - coolify.managed=true
+      - coolify.version=4.0.0-beta.306
+      - coolify.applicationId=10
+      - coolify.type=application
+      - coolify.name=mailpit-q88ocsc-120704614736
+      - coolify.pullRequestId=0
+    container_name: mailpit-q88ocsc-120704614736
 volumes:
   saleor-db:
     driver: local
   saleor-redis:
     driver: local
   saleor-media:
-
+    name: saleor-media
+  jaeger-data:
+    driver: local
 networks:
-  saleor-backend-tier:
-    driver: bridge
+  saleor-backend-tier: null
+  q88ocsc:
+    name: q88ocsc
+    external: true
