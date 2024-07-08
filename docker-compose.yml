@@ -21,7 +21,7 @@ services:
     environment:
       - JAEGER_AGENT_HOST=jaeger
       - 'DASHBOARD_URL=http://localhost:9000/'
-      - 'ALLOWED_HOSTS=localhost,api,*.networkguru.i'
+      - 'ALLOWED_HOSTS=localhost,api,fokgocw.networkguru.ir'
     labels:
       - traefik.enable=true
       - traefik.http.middlewares.gzip.compress=true
